@@ -30,3 +30,10 @@ go.work.sum
 .idea/vcs.xml
 .idea/inspectionProfiles/Project_Default.xml
 terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.93.0/windows_386/LICENSE.txt
+bin/create-note/lambda.zip
+bin/delete-note/lambda.zip
+bin/get-note/lambda.zip
+bin/list-notes/lambda.zip
+bin/update-note/lambda.zip
+terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.93.0/linux_amd64/LICENSE.txt
+terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.93.0/linux_amd64/terraform-provider-aws_v5.93.0_x5
