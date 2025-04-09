@@ -3,6 +3,7 @@ GO_VERSION = 1.24.0
 BIN = bin
 CMD_DIR = cmd
 TF_DIR = terraform
+LAMBDA_NAMES = create-note delete-note get-note list-notes update-note
 
 .PHONY: install-go install-zip install-terraform tf-init tf-deploy tf-remove clean release build compile zip clear-build
 
@@ -40,25 +41,16 @@ release: build tf-deploy
 build: clean compile zip clear-build
 
 compile:
-	rm -rf ./bin
-	env GOARCH=arm64 GOOS=linux
-
-	go build -tags create-note.norpc -ldflags="-s -w" -o 	$(BIN)/create-note/bootstrap $(CMD_DIR)/create-note/main.go
-	go build -tags delete-note.norpc -ldflags="-s -w" -o 	$(BIN)/delete-note/bootstrap $(CMD_DIR)/delete-note/main.go
-	go build -tags get-note.norpc -ldflags="-s -w" -o 		$(BIN)/get-note/bootstrap $(CMD_DIR)/get-note/main.go
-	go build -tags list-notes.norpc -ldflags="-s -w" -o 	$(BIN)/list-notes/bootstrap $(CMD_DIR)/list-notes/main.go
-	go build -tags update-note.norpc -ldflags="-s -w" -o 	$(BIN)/update-note/bootstrap $(CMD_DIR)/update-note/main.go
+	@$(foreach lambda,$(LAMBDA_NAMES), \
+		GOARCH=arm64 GOOS=linux CGO_ENABLED=0 go build -tags $(lambda).norpc -ldflags="-s -w" -o $(BIN)/$(lambda)/bootstrap $(CMD_DIR)/$(lambda)/main.go; \
+	)
 
 zip:
-	zip $(BIN)/create-note/lambda.zip 	$(BIN)/create-note/bootstrap
-	zip $(BIN)/delete-note/lambda.zip 	$(BIN)/delete-note/bootstrap
-	zip $(BIN)/get-note/lambda.zip 		$(BIN)/get-note/bootstrap
-	zip $(BIN)/list-notes/lambda.zip 	$(BIN)/list-notes/bootstrap
-	zip $(BIN)/update-note/lambda.zip 	$(BIN)/update-note/bootstrap
+	@$(foreach lambda,$(LAMBDA_NAMES), \
+		zip -j $(BIN)/$(lambda)/lambda.zip $(BIN)/$(lambda)/bootstrap; \
+	)
 
 clear-build:
-	rm -rf $(BIN)/create-note/bootstrap
-	rm -rf $(BIN)/delete-note/bootstrap
-	rm -rf $(BIN)/get-note/bootstrap
-	rm -rf $(BIN)/list-notes/bootstrap
-	rm -rf $(BIN)/update-note/bootstrap
+	@$(foreach lambda,$(LAMBDA_NAMES), \
+		rm -f $(BIN)/$(lambda)/bootstrap; \
+	)
